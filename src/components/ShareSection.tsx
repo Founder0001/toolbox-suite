@@ -1,7 +1,7 @@
-import { useState, useCallback, memo } from 'react';
+import { useState } from 'react';
 import { Share2, Copy, Check, Twitter, Facebook, Linkedin, Mail, MessageCircle, Send } from 'lucide-react';
 
-export const ShareSection = memo(function ShareSection() {
+export function ShareSection() {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
 
@@ -19,7 +19,7 @@ export const ShareSection = memo(function ShareSection() {
     { name: 'Email', icon: Mail, url: `mailto:?subject=Check%20out%20ToolBox%20Suite&body=${encodedText}%20${encodedUrl}`, color: 'hover:bg-amber-500/20 hover:text-amber-400' },
   ];
 
-  const handleCopy = useCallback(async () => {
+  const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
@@ -35,9 +35,9 @@ export const ShareSection = memo(function ShareSection() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [shareUrl]);
+  };
 
-  const handleNativeShare = useCallback(async () => {
+  const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({ title: 'ToolBox Suite', text: shareText, url: shareUrl });
@@ -47,11 +47,12 @@ export const ShareSection = memo(function ShareSection() {
     } else {
       handleCopy();
     }
-  }, [shareUrl, shareText, handleCopy]);
+  };
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="glass-card rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden">
+        {/* Decorative gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
 
         <div className="relative z-10">
@@ -66,6 +67,7 @@ export const ShareSection = memo(function ShareSection() {
             It's 100% free, private, and works right in the browser — no signup needed!
           </p>
 
+          {/* Social Share Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
             {shareLinks.map(link => {
               const Icon = link.icon;
@@ -84,6 +86,7 @@ export const ShareSection = memo(function ShareSection() {
             })}
           </div>
 
+          {/* Copy Link & Native Share */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={handleCopy}
@@ -104,4 +107,4 @@ export const ShareSection = memo(function ShareSection() {
       </div>
     </section>
   );
-});
+}

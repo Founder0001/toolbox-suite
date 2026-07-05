@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo, memo } from 'react';
+import { useRef, useCallback } from 'react';
 import { categories, type Category } from '@/data/categories';
 import { ArrowRight } from 'lucide-react';
 
@@ -7,7 +7,7 @@ interface CategoryGridProps {
   onSelect: (category: Category) => void;
 }
 
-export const CategoryGrid = memo(function CategoryGrid({ filter, onSelect }: CategoryGridProps) {
+export function CategoryGrid({ filter, onSelect }: CategoryGridProps) {
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLButtonElement>, index: number) => {
@@ -20,15 +20,15 @@ export const CategoryGrid = memo(function CategoryGrid({ filter, onSelect }: Cat
     card.style.setProperty('--mouse-y', `${y}px`);
   }, []);
 
-  const filtered = useMemo(() => {
-    if (!filter) return categories;
+  const filtered = categories.filter((cat) => {
+    if (!filter) return true;
     const f = filter.toLowerCase();
-    return categories.filter((cat) =>
+    return (
       cat.name.toLowerCase().includes(f) ||
       cat.description.toLowerCase().includes(f) ||
       cat.shortName.toLowerCase().includes(f)
     );
-  }, [filter]);
+  });
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -55,18 +55,25 @@ export const CategoryGrid = memo(function CategoryGrid({ filter, onSelect }: Cat
                 aria-label={`Open ${cat.shortName}`}
               >
                 <div className="relative z-10">
+                  {/* Icon */}
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundColor: `${cat.color}15`, color: cat.color }}
                   >
                     <Icon className="w-6 h-6" />
                   </div>
+
+                  {/* Title */}
                   <h3 className="text-lg font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">
                     {cat.shortName}
                   </h3>
+
+                  {/* Description */}
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                     {cat.description}
                   </p>
+
+                  {/* Arrow */}
                   <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">
                     <span>Explore Tools</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -79,4 +86,4 @@ export const CategoryGrid = memo(function CategoryGrid({ filter, onSelect }: Cat
       )}
     </main>
   );
-});
+}

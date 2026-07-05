@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Lightbulb, ThumbsUp, Send, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
@@ -18,7 +18,7 @@ interface Suggestion {
 
 const categories = ['General', 'PDF Tools', 'Image Tools', 'Student Tools', 'Medical Tools', 'Code Tools', 'SEO Tools', 'Text Tools', 'Unit Converters', 'AI Prompts', 'Other'];
 
-export const SuggestionBox = memo(function SuggestionBox() {
+export function SuggestionBox() {
   const [toolName, setToolName] = useState('');
   const [category, setCategory] = useState('General');
   const [description, setDescription] = useState('');
@@ -49,13 +49,14 @@ export const SuggestionBox = memo(function SuggestionBox() {
 
   useEffect(() => {
     loadSuggestions();
+    // Load voted IDs from localStorage
     try {
       const stored = localStorage.getItem('toolbox-voted-suggestions');
       if (stored) setVotedIds(new Set(JSON.parse(stored)));
     } catch { /* ignore */ }
   }, [loadSuggestions]);
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = async () => {
     if (!toolName.trim() || !description.trim()) {
       setError('Please enter a tool name and description.');
       return;
@@ -83,9 +84,9 @@ export const SuggestionBox = memo(function SuggestionBox() {
     } finally {
       setSubmitting(false);
     }
-  }, [toolName, description, category, email, loadSuggestions]);
+  };
 
-  const handleVote = useCallback(async (id: string) => {
+  const handleVote = async (id: string) => {
     if (votedIds.has(id)) return;
     const suggestion = suggestions.find(s => s.id === id);
     if (!suggestion) return;
@@ -112,13 +113,7 @@ export const SuggestionBox = memo(function SuggestionBox() {
       reverted.delete(id);
       setVotedIds(reverted);
     }
-  }, [votedIds, suggestions]);
-
-  // Handlers for input changes (memoized)
-  const onToolNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setToolName(e.target.value), []);
-  const onCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value), []);
-  const onDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value), []);
-  const onEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), []);
+  };
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -143,14 +138,14 @@ export const SuggestionBox = memo(function SuggestionBox() {
               type="text"
               placeholder="e.g. PDF to Excel Converter"
               value={toolName}
-              onChange={onToolNameChange}
+              onChange={(e) => setToolName(e.target.value)}
               className="premium-input w-full"
               maxLength={100}
             />
           </div>
           <div>
             <label className="block text-muted-foreground text-xs mb-1">Category</label>
-            <select value={category} onChange={onCategoryChange} className="premium-input w-full">
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="premium-input w-full">
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -159,7 +154,7 @@ export const SuggestionBox = memo(function SuggestionBox() {
             <textarea
               placeholder="Describe what the tool should do..."
               value={description}
-              onChange={onDescriptionChange}
+              onChange={(e) => setDescription(e.target.value)}
               className="premium-input w-full min-h-[80px] resize-y"
               maxLength={500}
             />
@@ -170,7 +165,7 @@ export const SuggestionBox = memo(function SuggestionBox() {
               type="email"
               placeholder="your@email.com"
               value={email}
-              onChange={onEmailChange}
+              onChange={(e) => setEmail(e.target.value)}
               className="premium-input w-full"
               maxLength={200}
             />
@@ -245,4 +240,4 @@ export const SuggestionBox = memo(function SuggestionBox() {
       </div>
     </section>
   );
-});
+}

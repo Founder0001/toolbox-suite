@@ -1,6 +1,6 @@
 import { ArrowLeft, Wrench, Sun, Moon, FileText } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NavbarProps {
   onBack?: () => void;
@@ -9,7 +9,7 @@ interface NavbarProps {
   onArticles?: () => void;
 }
 
-export const Navbar = memo(function Navbar({ onBack, showBack, badge, onArticles }: NavbarProps) {
+export function Navbar({ onBack, showBack, badge, onArticles }: NavbarProps) {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -17,11 +17,11 @@ export const Navbar = memo(function Navbar({ onBack, showBack, badge, onArticles
     setMounted(true);
   }, []);
 
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = () => {
     if (resolvedTheme === 'dark') setTheme('light');
     else if (resolvedTheme === 'light') setTheme('dark');
     else setTheme('system');
-  }, [resolvedTheme, setTheme]);
+  };
 
   const themeIcon = resolvedTheme === 'dark'
     ? <Sun className="w-4 h-4" />
@@ -31,6 +31,7 @@ export const Navbar = memo(function Navbar({ onBack, showBack, badge, onArticles
     <nav className="glass-navbar sticky top-0 z-50 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <button
             onClick={onBack}
             className="flex items-center gap-3 group"
@@ -58,7 +59,9 @@ export const Navbar = memo(function Navbar({ onBack, showBack, badge, onArticles
             </div>
           </button>
 
+          {/* Right side actions */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
             {mounted && (
               <button
                 onClick={toggleTheme}
@@ -103,4 +106,4 @@ export const Navbar = memo(function Navbar({ onBack, showBack, badge, onArticles
       </div>
     </nav>
   );
-});
+}

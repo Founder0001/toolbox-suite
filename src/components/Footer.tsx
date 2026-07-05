@@ -1,11 +1,10 @@
 import { Shield, Mail, FileText, HelpCircle, Cookie } from 'lucide-react';
-import { memo, useCallback } from 'react';
 
 interface FooterProps {
   onNavigate: (page: 'about' | 'contact' | 'privacy' | 'terms' | 'cookie') => void;
 }
 
-export const Footer = memo(function Footer({ onNavigate }: FooterProps) {
+export function Footer({ onNavigate }: FooterProps) {
   const links = [
     { id: 'about' as const, label: 'About Us', icon: HelpCircle },
     { id: 'contact' as const, label: 'Contact Us', icon: Mail },
@@ -13,10 +12,6 @@ export const Footer = memo(function Footer({ onNavigate }: FooterProps) {
     { id: 'cookie' as const, label: 'Cookie Policy', icon: Cookie },
     { id: 'terms' as const, label: 'Terms', icon: FileText },
   ];
-
-  const handleNavigate = useCallback((page: 'about' | 'contact' | 'privacy' | 'terms' | 'cookie') => {
-    onNavigate(page);
-  }, [onNavigate]);
 
   return (
     <footer className="border-t border-border/40 bg-surface-1/50">
@@ -31,7 +26,6 @@ export const Footer = memo(function Footer({ onNavigate }: FooterProps) {
                 className="w-full h-full object-cover opacity-80"
                 width={32}
                 height={32}
-                loading="lazy"
               />
             </div>
             <span className="text-sm text-muted-foreground">
@@ -44,7 +38,7 @@ export const Footer = memo(function Footer({ onNavigate }: FooterProps) {
             {links.map((link) => (
               <button
                 key={link.id}
-                onClick={() => handleNavigate(link.id)}
+                onClick={() => onNavigate(link.id)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all"
               >
                 <link.icon className="w-3.5 h-3.5" />
@@ -62,4 +56,4 @@ export const Footer = memo(function Footer({ onNavigate }: FooterProps) {
       </div>
     </footer>
   );
-});
+}

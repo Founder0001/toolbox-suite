@@ -11,25 +11,15 @@
   <link rel="icon" type="image/png" href="/images/logo.png" />
   <link rel="apple-touch-icon" href="/images/logo.png" />
 
-  <!-- Security headers (meta fallback) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://*.supabase.co; frame-src 'none';" />
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
-
-  <!-- Preconnect & DNS Prefetch -->
+  <!-- Preconnect for fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-  <link rel="dns-prefetch" href="https://api.supabase.co" />
 
   <!-- Preload critical font -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" /></noscript>
-
-  <!-- Preload LCP image (adjust src to your actual hero image) -->
-  <!-- <link rel="preload" as="image" href="/images/hero.webp" fetchpriority="high" /> -->
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -86,17 +76,6 @@
   </script>
 
   <title>ToolBox Suite - 100+ Professional Web Utilities</title>
-
-  <!-- Critical CSS inlined (prevents FOUC) -->
-  <style>
-    /* Minimal critical styles – enough to render above-the-fold */
-    body { margin:0; font-family: 'Inter', system-ui, sans-serif; background:#f9fafb; }
-    .container { max-width:1200px; margin:0 auto; padding:0 1rem; }
-    .glass-navbar { backdrop-filter:blur(12px); background:rgba(255,255,255,0.6); }
-    .dark .glass-navbar { background:rgba(15,15,20,0.8); }
-    .text-gradient-brand { background:linear-gradient(135deg,#6366f1,#a855f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    /* Add more critical layout styles if needed */
-  </style>
 </head>
 <body>
   <div id="root"></div>

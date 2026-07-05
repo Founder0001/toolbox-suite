@@ -103,7 +103,7 @@ function ImageConverter() {
       {canvas && (
         <div className="flex gap-2 flex-wrap">
           {['PNG', 'JPG', 'WebP'].map(fmt => (
-            <button key={fmt} type="button" onClick={() => downloadCanvas(currentImageCanvas!, `${currentImageFileName}.${fmt.toLowerCase()}`, fmt === 'JPG' ? 'image/jpeg' : `image/${fmt.toLowerCase()}`)} className="btn-premium text-xs">
+            <button key={fmt} onClick={() => downloadCanvas(currentImageCanvas!, `${currentImageFileName}.${fmt.toLowerCase()}`, fmt === 'JPG' ? 'image/jpeg' : `image/${fmt.toLowerCase()}`)} className="btn-premium text-xs">
               <Download className="w-3 h-3" /> {fmt}
             </button>
           ))}
@@ -148,8 +148,8 @@ function ImageResizer() {
             <div><label className="text-muted-foreground text-xs">Quality (0.1-1)</label><input type="number" value={q} onChange={e => setQ(e.target.value)} min="0.1" max="1" step="0.05" className="premium-input w-full text-xs" /></div>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <button type="button" onClick={resize} className="btn-premium text-xs">Resize & Download</button>
-            <button type="button" onClick={compress} className="btn-secondary-premium text-xs">Compress Original</button>
+            <button onClick={resize} className="btn-premium text-xs">Resize & Download</button>
+            <button onClick={compress} className="btn-secondary-premium text-xs">Compress Original</button>
           </div>
           <ImagePreview canvas={canvas} />
         </>
@@ -275,7 +275,7 @@ function ImageCropper() {
             <div><label className="text-muted-foreground text-[10px]">W</label><input type="number" value={cw} onChange={e => setCw(e.target.value)} className="premium-input w-full text-xs py-1.5" /></div>
             <div><label className="text-muted-foreground text-[10px]">H</label><input type="number" value={ch} onChange={e => setCh(e.target.value)} className="premium-input w-full text-xs py-1.5" /></div>
           </div>
-          <button type="button" onClick={applyCrop} className="btn-premium text-xs">
+          <button onClick={applyCrop} className="btn-premium text-xs">
             <Crop className="w-3 h-3" /> Crop & Download
           </button>
           <ImagePreview canvas={canvas} />
@@ -366,7 +366,7 @@ function ImageFilters() {
             </button>
             <button onClick={() => { setGrayscale(100); setSepia(0); setTimeout(updatePreview, 0); }} className="btn-secondary-premium text-xs">Grayscale</button>
             <button onClick={() => { setSepia(100); setGrayscale(0); setTimeout(updatePreview, 0); }} className="btn-secondary-premium text-xs">Sepia</button>
-            <button type="button" onClick={downloadFiltered} className="btn-premium text-xs">
+            <button onClick={downloadFiltered} className="btn-premium text-xs">
               <Download className="w-3 h-3" /> Download
             </button>
           </div>
@@ -636,21 +636,18 @@ function BgRemover() {
       <div className="flex gap-2 p-1 bg-secondary/40 rounded-lg w-fit flex-wrap">
         <button
           onClick={() => setMode('ai')}
-          type="button"
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mode === 'ai' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <Wand2 className="w-3 h-3 inline mr-1" /> AI Removal
         </button>
         <button
           onClick={() => setMode('edge')}
-          type="button"
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mode === 'edge' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <Scissors className="w-3 h-3 inline mr-1" /> Edge Detect
         </button>
         <button
           onClick={() => setMode('color')}
-          type="button"
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mode === 'color' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <Eraser className="w-3 h-3 inline mr-1" /> Color Key
@@ -700,7 +697,6 @@ function BgRemover() {
           <button
             onClick={mode === 'ai' ? removeBgAI : mode === 'edge' ? removeBgEdge : removeBgColor}
             disabled={processing}
-            type="button"
             className="btn-premium text-xs"
           >
             {processing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
@@ -712,7 +708,7 @@ function BgRemover() {
             <div className="animate-fade-in">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-muted-foreground text-xs font-medium">Result</label>
-                <button type="button" onClick={downloadResult} className="btn-premium text-xs">
+                <button onClick={downloadResult} className="btn-premium text-xs">
                   <Download className="w-3 h-3" /> Download PNG
                 </button>
               </div>
@@ -756,7 +752,7 @@ export function ImageToolsSuite({ initialTool }: { initialTool?: string }) {
     const toolInfo = imageTools.find(t => t.id === activeTool);
     return (
       <div className="space-y-6 max-w-4xl mx-auto">
-        <button type="button" onClick={() => setActiveTool(null)} className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm font-medium transition-colors">
+        <button onClick={() => setActiveTool(null)} className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm font-medium transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Image Tools
         </button>
         <h3 className="text-xl font-bold text-foreground">{toolInfo?.name}</h3>
@@ -772,7 +768,7 @@ export function ImageToolsSuite({ initialTool }: { initialTool?: string }) {
       {imageTools.map(t => {
         const Icon = t.icon;
         return (
-          <button type="button" key={t.id} onClick={() => setActiveTool(t.id)} className="tool-card-premium text-center">
+          <button key={t.id} onClick={() => setActiveTool(t.id)} className="tool-card-premium text-center">
             <div className="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center mx-auto mb-3">
               <Icon className="w-6 h-6 text-violet-400" />
             </div>

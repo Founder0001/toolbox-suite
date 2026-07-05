@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect } from 'react';
 import { Cookie, X, Check, Settings } from 'lucide-react';
 
 interface CookiePreferences {
@@ -41,7 +41,7 @@ interface CookieConsentProps {
   onNavigate: (page: 'privacy' | 'cookie') => void;
 }
 
-export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieConsentProps) {
+export function CookieConsent({ onNavigate }: CookieConsentProps) {
   const [visible, setVisible] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [prefs, setPrefs] = useState<CookiePreferences>(defaultPreferences);
@@ -53,37 +53,27 @@ export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieC
     }
   }, []);
 
-  const handleAcceptAll = useCallback(() => {
+  const handleAcceptAll = () => {
     const all: CookiePreferences = { necessary: true, analytics: true, functional: true };
     savePreferences(all);
     setPrefs(all);
     setVisible(false);
-  }, []);
+  };
 
-  const handleRejectAll = useCallback(() => {
+  const handleRejectAll = () => {
     const minimal: CookiePreferences = { necessary: true, analytics: false, functional: false };
     savePreferences(minimal);
     setPrefs(minimal);
     setVisible(false);
-  }, []);
+  };
 
-  const handleSaveCustom = useCallback(() => {
+  const handleSaveCustom = () => {
     const toSave: CookiePreferences = { ...prefs, necessary: true };
     savePreferences(toSave);
     setPrefs(toSave);
     setVisible(false);
     setShowCustomize(false);
-  }, [prefs]);
-
-  const toggleCustomize = useCallback(() => setShowCustomize(v => !v), []);
-  const closeCustomize = useCallback(() => setShowCustomize(false), []);
-
-  const setFunctional = useCallback((v: boolean) => {
-    setPrefs(p => ({ ...p, functional: v }));
-  }, []);
-  const setAnalytics = useCallback((v: boolean) => {
-    setPrefs(p => ({ ...p, analytics: v }));
-  }, []);
+  };
 
   if (!visible) return null;
 
@@ -113,7 +103,7 @@ export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieC
                 <button onClick={handleRejectAll} className="btn-secondary-premium text-xs whitespace-nowrap">
                   Reject
                 </button>
-                <button onClick={toggleCustomize} className="btn-secondary-premium text-xs whitespace-nowrap">
+                <button onClick={() => setShowCustomize(true)} className="btn-secondary-premium text-xs whitespace-nowrap">
                   <Settings className="w-3.5 h-3.5" />
                   Customize
                 </button>
@@ -128,7 +118,7 @@ export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieC
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-foreground">Customize Cookie Preferences</h3>
                 <button
-                  onClick={closeCustomize}
+                  onClick={() => setShowCustomize(false)}
                   className="w-8 h-8 rounded-lg hover:bg-secondary/60 flex items-center justify-center text-muted-foreground"
                   aria-label="Close customization"
                 >
@@ -146,13 +136,13 @@ export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieC
                   label="Functional Cookies"
                   description="Enable enhanced functionality like theme preference and tool settings."
                   checked={prefs.functional}
-                  onChange={setFunctional}
+                  onChange={(v) => setPrefs(p => ({ ...p, functional: v }))}
                 />
                 <CookieToggle
                   label="Analytics Cookies"
                   description="Help us understand how visitors interact with the site so we can improve it."
                   checked={prefs.analytics}
-                  onChange={setAnalytics}
+                  onChange={(v) => setPrefs(p => ({ ...p, analytics: v }))}
                 />
               </div>
               <div className="flex items-center justify-end gap-2">
@@ -168,7 +158,7 @@ export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieC
       </div>
     </div>
   );
-});
+}
 
 function CookieToggle({
   label,
@@ -183,10 +173,6 @@ function CookieToggle({
   disabled?: boolean;
   onChange?: (v: boolean) => void;
 }) {
-  const handleToggle = useCallback(() => {
-    if (!disabled && onChange) onChange(!checked);
-  }, [disabled, onChange, checked]);
-
   return (
     <div className="flex items-center justify-between gap-4 p-3 bg-secondary/30 border border-border/40 rounded-lg">
       <div className="flex-1">
@@ -194,7 +180,7 @@ function CookieToggle({
         <div className="text-xs text-muted-foreground mt-0.5">{description}</div>
       </div>
       <button
-        onClick={handleToggle}
+        onClick={() => !disabled && onChange?.(!checked)}
         disabled={disabled}
         className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
           checked ? 'bg-primary' : 'bg-muted-foreground/30'

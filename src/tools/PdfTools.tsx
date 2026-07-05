@@ -103,7 +103,7 @@ function PdfMerge() {
       {files && files.length > 0 && (
         <p className="text-xs text-muted-foreground mb-3">{files.length} file(s) selected</p>
       )}
-      <button type="button" onClick={run} className="btn-premium text-xs">Merge & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Merge & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -138,7 +138,7 @@ function PdfSplit() {
   return (
     <>
       <FileInput label="Select PDF" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Split into Pages</button>
+      <button onClick={run} className="btn-premium text-xs">Split into Pages</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
       <div className="mt-2 space-y-1">
         {links.map(l => (
@@ -178,7 +178,7 @@ function PdfRemovePages() {
         <label className="block text-muted-foreground text-xs mb-1">Pages to Remove (comma-separated)</label>
         <input type="text" placeholder="1,3,5" value={pagesStr} onChange={(e) => setPagesStr(e.target.value)} className="premium-input w-full" />
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Remove & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Remove & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -212,7 +212,7 @@ function PdfExtractPages() {
         <label className="block text-muted-foreground text-xs mb-1">Pages to Extract</label>
         <input type="text" placeholder="1,2,3" value={pagesStr} onChange={(e) => setPagesStr(e.target.value)} className="premium-input w-full" />
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Extract & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Extract & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -237,7 +237,7 @@ function PdfCompress() {
   return (
     <>
       <FileInput label="Select PDF" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Compress & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Compress & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -263,7 +263,7 @@ function PdfOcr() {
   return (
     <>
       <FileInput label="Select PDF" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Extract Text</button>
+      <button onClick={run} className="btn-premium text-xs">Extract Text</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
       {result && (
         <pre className="mt-4 bg-secondary/40 border border-border/50 rounded-lg p-3 text-xs font-mono whitespace-pre-wrap max-h-96 overflow-auto">
@@ -309,7 +309,7 @@ function PdfRotate() {
           <option value="270">270 deg Clockwise</option>
         </select>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Rotate & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Rotate & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -350,7 +350,7 @@ function PdfWatermark() {
         <label className="block text-muted-foreground text-xs mb-1">Watermark Text</label>
         <input type="text" placeholder="CONFIDENTIAL" value={text} onChange={(e) => setText(e.target.value)} className="premium-input w-full" />
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Add Watermark & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Add Watermark & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -409,7 +409,7 @@ function PdfUnlock() {
         <label className="block text-muted-foreground text-xs mb-1">Password</label>
         <input type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} className="premium-input w-full" />
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Unlock & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Unlock & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -466,7 +466,7 @@ function PdfProtect() {
           Your file is encrypted with AES-256-GCM (military-grade encryption). The output is a .enc file that can only be opened with the Unlock PDF tool using the same password. This is not standard PDF password protection — it's stronger.
         </p>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Encrypt & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Encrypt & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -501,7 +501,7 @@ function PdfSign() {
         <label className="block text-muted-foreground text-xs mb-1">Signature Text</label>
         <input type="text" placeholder="John Doe" value={sigText} onChange={(e) => setSigText(e.target.value)} className="premium-input w-full" />
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Sign & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Sign & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -536,7 +536,7 @@ function PdfAiSummarize() {
   return (
     <>
       <FileInput label="Select PDF" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Extract & Summarize</button>
+      <button onClick={run} className="btn-premium text-xs">Extract & Summarize</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
       {result && (
         <div className="mt-4 space-y-3">
@@ -552,7 +552,7 @@ function PdfAiSummarize() {
             <div className="text-primary text-xs font-semibold mb-1">Key Excerpts</div>
             <p className="text-muted-foreground text-xs leading-relaxed">{result.summary}</p>
           </div>
-          <button type="button" onClick={() => navigator.clipboard.writeText(result.summary)} className="btn-secondary-premium text-xs">Copy Summary</button>
+          <button onClick={() => navigator.clipboard.writeText(result.summary)} className="btn-secondary-premium text-xs">Copy Summary</button>
         </div>
       )}
     </>
@@ -612,7 +612,7 @@ function GenericConvertToPdf({ name, ext }: { name: string; ext: string }) {
       {files && files.length > 0 && (
         <p className="text-xs text-muted-foreground mb-3">{files.length} file(s) selected</p>
       )}
-      <button type="button" onClick={run} className="btn-premium text-xs">Convert to PDF</button>
+      <button onClick={run} className="btn-premium text-xs">Convert to PDF</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -666,7 +666,7 @@ function GenericConvertFromPdf({ name, format }: { name: string; format: string 
   return (
     <>
       <FileInput label="Select PDF" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Convert to {name}</button>
+      <button onClick={run} className="btn-premium text-xs">Convert to {name}</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
       <div className="mt-2 space-y-1">
         {links.map(l => (
@@ -739,7 +739,7 @@ function PdfTranslate() {
           <option value="ur">Urdu</option>
         </select>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Extract & Translate</button>
+      <button onClick={run} className="btn-premium text-xs">Extract & Translate</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
       {result && (
         <div className="mt-4 space-y-3">
@@ -747,7 +747,7 @@ function PdfTranslate() {
             <div className="text-primary text-xs font-semibold mb-1">Translated Text</div>
             <p className="text-muted-foreground text-xs leading-relaxed whitespace-pre-wrap max-h-72 overflow-auto">{result}</p>
           </div>
-          <button type="button" onClick={downloadResult} className="btn-secondary-premium text-xs">Download Translation</button>
+          <button onClick={downloadResult} className="btn-secondary-premium text-xs">Download Translation</button>
         </div>
       )}
     </>
@@ -786,7 +786,7 @@ function PdfSort() {
           <option value="desc">Descending (last page first)</option>
         </select>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Sort & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Sort & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -814,7 +814,7 @@ function PdfRepair() {
   return (
     <>
       <FileInput label="Select Corrupted PDF" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Repair & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Repair & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -853,7 +853,7 @@ function PdfFlatten() {
   return (
     <>
       <FileInput label="Select PDF with Forms" onChange={(f) => setFile(f?.[0] || null)} />
-      <button type="button" onClick={run} className="btn-premium text-xs">Flatten & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Flatten & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -890,7 +890,7 @@ function PdfCrop() {
         <input type="number" placeholder="50" value={margin} onChange={(e) => setMargin(e.target.value)} className="premium-input w-full" />
         <p className="text-muted-foreground text-[10px] mt-1">1 inch = 72 points. Enter 0 for no crop.</p>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Crop & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Crop & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -943,7 +943,7 @@ function PdfFill() {
   return (
     <>
       <FileInput label="Select PDF with Form Fields" onChange={(f) => setFile(f?.[0] || null)} />
-      <button onClick={detectFields} type="button" className="btn-secondary-premium text-xs mb-3">Detect Form Fields</button>
+      <button onClick={detectFields} className="btn-secondary-premium text-xs mb-3">Detect Form Fields</button>
       {fields.length > 0 && (
         <div className="mb-4 space-y-2">
           {fields.map((f, i) => (
@@ -960,7 +960,7 @@ function PdfFill() {
           ))}
         </div>
       )}
-      <button type="button" onClick={run} className="btn-premium text-xs">Fill & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Fill & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -1014,7 +1014,7 @@ function PdfRedact() {
         <input type="text" placeholder="e.g. SSN, confidential, name" value={searchText} onChange={(e) => setSearchText(e.target.value)} className="premium-input w-full" />
         <p className="text-muted-foreground text-[10px] mt-1">All occurrences of this text will be covered with black rectangles.</p>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Redact & Download</button>
+      <button onClick={run} className="btn-premium text-xs">Redact & Download</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
     </>
   );
@@ -1071,7 +1071,7 @@ function PdfCompare() {
           <input type="file" accept=".pdf" onChange={(e) => setFile2(e.target.files?.[0] || null)} className="block w-full text-xs text-muted-foreground file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-primary-foreground cursor-pointer" />
         </div>
       </div>
-      <button type="button" onClick={run} className="btn-premium text-xs">Compare PDFs</button>
+      <button onClick={run} className="btn-premium text-xs">Compare PDFs</button>
       {status && <div className="mt-3 text-xs text-muted-foreground">{status}</div>}
       {result && (
         <div className="mt-4 space-y-4">
@@ -1183,7 +1183,7 @@ export function PdfToolsSuite({ initialTool }: { initialTool?: string }) {
   if (activeTool && ToolComponent) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto">
-        <button type="button" onClick={() => setActiveTool(null)} className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm font-medium transition-colors">
+        <button onClick={() => setActiveTool(null)} className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm font-medium transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to PDF Suite
         </button>
         <h3 className="text-xl font-bold text-foreground">{toolDef.name}</h3>
@@ -1203,7 +1203,7 @@ export function PdfToolsSuite({ initialTool }: { initialTool?: string }) {
             {section.tools.map(t => {
               const Icon = t.icon;
               return (
-                <button type="button" key={t.id} onClick={() => setActiveTool(t.id)} className="tool-card-premium text-center p-3">
+                <button key={t.id} onClick={() => setActiveTool(t.id)} className="tool-card-premium text-center p-3">
                   <Icon className="w-5 h-5 text-muted-foreground mx-auto mb-1.5" />
                   <span className="text-foreground text-xs font-medium">{t.name}</span>
                 </button>
