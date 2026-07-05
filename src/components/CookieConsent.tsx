@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Cookie, X, Check, Settings } from 'lucide-react';
 
 interface CookiePreferences {
@@ -41,7 +41,7 @@ interface CookieConsentProps {
   onNavigate: (page: 'privacy' | 'cookie') => void;
 }
 
-export function CookieConsent({ onNavigate }: CookieConsentProps) {
+export const CookieConsent = memo(function CookieConsent({ onNavigate }: CookieConsentProps) {
   const [visible, setVisible] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [prefs, setPrefs] = useState<CookiePreferences>(defaultPreferences);
@@ -53,32 +53,42 @@ export function CookieConsent({ onNavigate }: CookieConsentProps) {
     }
   }, []);
 
-  const handleAcceptAll = () => {
+  const handleAcceptAll = useCallback(() => {
     const all: CookiePreferences = { necessary: true, analytics: true, functional: true };
     savePreferences(all);
     setPrefs(all);
     setVisible(false);
-  };
+  }, []);
 
-  const handleRejectAll = () => {
+  const handleRejectAll = useCallback(() => {
     const minimal: CookiePreferences = { necessary: true, analytics: false, functional: false };
     savePreferences(minimal);
     setPrefs(minimal);
     setVisible(false);
-  };
+  }, []);
 
-  const handleSaveCustom = () => {
+  const handleSaveCustom = useCallback(() => {
     const toSave: CookiePreferences = { ...prefs, necessary: true };
     savePreferences(toSave);
     setPrefs(toSave);
     setVisible(false);
     setShowCustomize(false);
-  };
+  }, [prefs]);
+
+  const toggleCustomize = useCallback(() => setShowCustomize(v => !v), []);
+  const closeCustomize = useCallback(() => setShowCustomize(false), []);
+
+  const setFunctional = useCallback((v: boolean) => {
+    setPrefs(p => ({ ...p, functional: v }));
+  }, []);
+  const setAnalytics = useCallback((v: boolean) => {
+    setPrefs(p => ({ ...p, analytics: v }));
+  }, []);
 
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] animate-slide-up" role="dialog" aria-label="Cookie consent" aria-live="polite">
+    <div className="fixed bottom-0 left-0 right-0 z-[100] animate-slide-up">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
         <div className="glass-card rounded-2xl p-5 sm:p-6 shadow-2xl">
           {!showCustomize ? (
@@ -93,21 +103,21 @@ export function CookieConsent({ onNavigate }: CookieConsentProps) {
                     We use cookies to enhance your browsing experience, analyze site traffic, and personalize content.
                     Necessary cookies are required for the site to function. You can choose which optional cookies to enable.
                     Read our{' '}
-                    <button onClick={() => onNavigate('privacy')} type="button" className="text-primary hover:underline font-medium">Privacy Policy</button>
+                    <button onClick={() => onNavigate('privacy')} className="text-primary hover:underline font-medium">Privacy Policy</button>
                     {' '}and{' '}
-                    <button onClick={() => onNavigate('cookie')} type="button" className="text-primary hover:underline font-medium">Cookie Policy</button>.
+                    <button onClick={() => onNavigate('cookie')} className="text-primary hover:underline font-medium">Cookie Policy</button>.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                <button onClick={handleRejectAll} type="button" className="btn-secondary-premium text-xs whitespace-nowrap">
+                <button onClick={handleRejectAll} className="btn-secondary-premium text-xs whitespace-nowrap">
                   Reject
                 </button>
-                <button onClick={() => setShowCustomize(true)} type="button" className="btn-secondary-premium text-xs whitespace-nowrap">
+                <button onClick={toggleCustomize} className="btn-secondary-premium text-xs whitespace-nowrap">
                   <Settings className="w-3.5 h-3.5" />
                   Customize
                 </button>
-                <button onClick={handleAcceptAll} type="button" className="btn-premium text-xs whitespace-nowrap">
+                <button onClick={handleAcceptAll} className="btn-premium text-xs whitespace-nowrap">
                   <Check className="w-3.5 h-3.5" />
                   Accept All
                 </button>
@@ -118,8 +128,7 @@ export function CookieConsent({ onNavigate }: CookieConsentProps) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-foreground">Customize Cookie Preferences</h3>
                 <button
-                  onClick={() => setShowCustomize(false)}
-                  type="button"
+                  onClick={closeCustomize}
                   className="w-8 h-8 rounded-lg hover:bg-secondary/60 flex items-center justify-center text-muted-foreground"
                   aria-label="Close customization"
                 >
@@ -137,18 +146,18 @@ export function CookieConsent({ onNavigate }: CookieConsentProps) {
                   label="Functional Cookies"
                   description="Enable enhanced functionality like theme preference and tool settings."
                   checked={prefs.functional}
-                  onChange={(v) => setPrefs(p => ({ ...p, functional: v }))}
+                  onChange={setFunctional}
                 />
                 <CookieToggle
                   label="Analytics Cookies"
                   description="Help us understand how visitors interact with the site so we can improve it."
                   checked={prefs.analytics}
-                  onChange={(v) => setPrefs(p => ({ ...p, analytics: v }))}
+                  onChange={setAnalytics}
                 />
               </div>
               <div className="flex items-center justify-end gap-2">
-                <button onClick={handleRejectAll} type="button" className="btn-secondary-premium text-xs">Reject All</button>
-                <button onClick={handleSaveCustom} type="button" className="btn-premium text-xs">
+                <button onClick={handleRejectAll} className="btn-secondary-premium text-xs">Reject All</button>
+                <button onClick={handleSaveCustom} className="btn-premium text-xs">
                   <Check className="w-3.5 h-3.5" />
                   Save Preferences
                 </button>
@@ -159,7 +168,7 @@ export function CookieConsent({ onNavigate }: CookieConsentProps) {
       </div>
     </div>
   );
-}
+});
 
 function CookieToggle({
   label,
@@ -174,6 +183,10 @@ function CookieToggle({
   disabled?: boolean;
   onChange?: (v: boolean) => void;
 }) {
+  const handleToggle = useCallback(() => {
+    if (!disabled && onChange) onChange(!checked);
+  }, [disabled, onChange, checked]);
+
   return (
     <div className="flex items-center justify-between gap-4 p-3 bg-secondary/30 border border-border/40 rounded-lg">
       <div className="flex-1">
@@ -181,9 +194,8 @@ function CookieToggle({
         <div className="text-xs text-muted-foreground mt-0.5">{description}</div>
       </div>
       <button
-        onClick={() => !disabled && onChange?.(!checked)}
+        onClick={handleToggle}
         disabled={disabled}
-        type="button"
         className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
           checked ? 'bg-primary' : 'bg-muted-foreground/30'
         } ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
