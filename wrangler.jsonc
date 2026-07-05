@@ -1,15 +1,9 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "toolbox-suite",
-  "compatibility_date": "2026-06-30",
-  "observability": {
-    "enabled": true
-  },
+  "main": "src/index.ts", 
+  "compatibility_date": "2026-07-05",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
-  },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  } 
 }
