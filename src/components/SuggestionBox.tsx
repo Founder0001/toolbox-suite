@@ -1,11 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Lightbulb, ThumbsUp, Send, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { getSecureClient } from '@/lib/secure-client';
+import { Honeypot } from '@/components/Honeypot';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabase = getSecureClient();
 
 interface Suggestion {
   id: string;
@@ -29,6 +27,9 @@ export function SuggestionBox() {
   const [loading, setLoading] = useState(true);
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
+  const [honeypotTriggered, setHoneypotTriggered] = useState(false);
+  const submitCountRef = useRef(0);
+  const lastSubmitRef = useRef(0);
 
   const loadSuggestions = useCallback(async () => {
     setLoading(true);
@@ -61,6 +62,19 @@ export function SuggestionBox() {
       setError('Please enter a tool name and description.');
       return;
     }
+    if (honeypotTriggered) {
+      setError('Submission blocked.');
+      return;
+    }
+    const now = Date.now();
+    if (now - lastSubmitRef.current < 10000) {
+      setError('Please wait before submitting again.');
+      return;
+    }
+    if (submitCountRef.current >= 5) {
+      setError('Too many submissions. Please try later.');
+      return;
+    }
     setSubmitting(true);
     setError('');
     try {
@@ -73,6 +87,8 @@ export function SuggestionBox() {
           email: email.trim() || null,
         });
       if (error) throw error;
+      submitCountRef.current++;
+      lastSubmitRef.current = Date.now();
       setSubmitted(true);
       setToolName('');
       setDescription('');
@@ -88,6 +104,9 @@ export function SuggestionBox() {
 
   const handleVote = async (id: string) => {
     if (votedIds.has(id)) return;
+    const now = Date.now();
+    if (now - lastSubmitRef.current < 2000) return;
+    lastSubmitRef.current = now;
     const suggestion = suggestions.find(s => s.id === id);
     if (!suggestion) return;
 
@@ -116,7 +135,7 @@ export function SuggestionBox() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" aria-label="Suggest a tool">
       <div className="glass-card rounded-2xl p-6 sm:p-8">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 mb-4">
@@ -131,10 +150,12 @@ export function SuggestionBox() {
         </div>
 
         {/* Submit Form */}
+        <Honeypot onChange={setHoneypotTriggered} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-muted-foreground text-xs mb-1">Tool Name *</label>
+            <label htmlFor="suggestion-tool-name" className="block text-muted-foreground text-xs mb-1">Tool Name *</label>
             <input
+              id="suggestion-tool-name"
               type="text"
               placeholder="e.g. PDF to Excel Converter"
               value={toolName}
@@ -144,14 +165,15 @@ export function SuggestionBox() {
             />
           </div>
           <div>
-            <label className="block text-muted-foreground text-xs mb-1">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="premium-input w-full">
+            <label htmlFor="suggestion-category" className="block text-muted-foreground text-xs mb-1">Category</label>
+            <select id="suggestion-category" value={category} onChange={(e) => setCategory(e.target.value)} className="premium-input w-full">
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="md:col-span-2">
-            <label className="block text-muted-foreground text-xs mb-1">Description *</label>
+            <label htmlFor="suggestion-description" className="block text-muted-foreground text-xs mb-1">Description *</label>
             <textarea
+              id="suggestion-description"
               placeholder="Describe what the tool should do..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -160,8 +182,9 @@ export function SuggestionBox() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-muted-foreground text-xs mb-1">Email (optional — for updates)</label>
+            <label htmlFor="suggestion-email" className="block text-muted-foreground text-xs mb-1">Email (optional — for updates)</label>
             <input
+              id="suggestion-email"
               type="email"
               placeholder="your@email.com"
               value={email}
@@ -184,6 +207,7 @@ export function SuggestionBox() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
+          type="button"
           className="btn-premium text-xs w-full sm:w-auto flex items-center justify-center gap-2"
         >
           {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -212,6 +236,7 @@ export function SuggestionBox() {
                   <button
                     onClick={() => handleVote(s.id)}
                     disabled={votedIds.has(s.id)}
+                    type="button"
                     className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-all ${
                       votedIds.has(s.id)
                         ? 'bg-primary/20 text-primary cursor-default'

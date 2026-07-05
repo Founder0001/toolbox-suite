@@ -28,23 +28,25 @@ export function Navbar({ onBack, showBack, badge, onArticles }: NavbarProps) {
     : <Moon className="w-4 h-4" />;
 
   return (
-    <nav className="glass-navbar sticky top-0 z-50 w-full">
+    <nav className="glass-navbar sticky top-0 z-50 w-full" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <button
             onClick={onBack}
+            type="button"
             className="flex items-center gap-3 group"
             aria-label="Go to dashboard"
           >
             <div className="relative w-9 h-9 rounded-lg overflow-hidden ring-1 ring-border/50 group-hover:ring-primary/40 transition-all">
               <img
-                src="/images/logo.png"
-                alt=""
+                src="/images/logo.webp"
+                alt="ToolBox Suite logo"
                 className="w-full h-full object-cover"
                 loading="eager"
                 width={36}
                 height={36}
+                fetchPriority="high"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -65,6 +67,7 @@ export function Navbar({ onBack, showBack, badge, onArticles }: NavbarProps) {
             {mounted && (
               <button
                 onClick={toggleTheme}
+                type="button"
                 className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
                 aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
                 title={`${resolvedTheme === 'dark' ? 'Light' : 'Dark'} mode`}
@@ -89,7 +92,9 @@ export function Navbar({ onBack, showBack, badge, onArticles }: NavbarProps) {
                 {onArticles && (
                   <button
                     onClick={onArticles}
+                    type="button"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-all"
+                    aria-label="Browse articles and guides"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Articles</span>

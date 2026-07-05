@@ -15,4 +15,19 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    minify: 'esbuild',
+    target: 'es2020',
+    cssMinify: true,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router'],
+          'ui-vendor': ['lucide-react', 'next-themes', 'clsx', 'tailwind-merge'],
+          'supabase': ['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
 });

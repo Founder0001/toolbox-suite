@@ -1,0 +1,17 @@
+{
+  "name": "ToolBox Suite - 100+ Professional Web Utilities",
+  "short_name": "ToolBox Suite",
+  "description": "100+ professional tools: PDF suite, medical calculators, unit converters, image utilities, AI prompt studio, student tools. 100% free, client-side secure.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -50,7 +50,7 @@ export function ShareSection() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" aria-label="Share with friends and family">
       <div className="glass-card rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden">
         {/* Decorative gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
@@ -90,6 +90,7 @@ export function ShareSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={handleCopy}
+              type="button"
               className="btn-secondary-premium text-xs flex items-center gap-2 min-w-[160px] justify-center"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -97,6 +98,7 @@ export function ShareSection() {
             </button>
             <button
               onClick={handleNativeShare}
+              type="button"
               className="btn-premium text-xs flex items-center gap-2 min-w-[160px] justify-center"
             >
               <Share2 className="w-4 h-4" />

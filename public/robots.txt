@@ -1,0 +1,35 @@
+User-agent: *
+Allow: /
+Disallow: /legal/
+Disallow: /api/
+Disallow: /tools/
+Crawl-delay: 10
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Sogou
+Disallow: /
+
+Sitemap: https://toolbox-suite.pages.dev/sitemap.xml

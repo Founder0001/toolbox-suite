@@ -3,13 +3,14 @@ import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
 import { CategoryGrid } from '@/components/CategoryGrid';
 import { Footer } from '@/components/Footer';
-import { CookieConsent } from '@/components/CookieConsent';
-import { ShareSection } from '@/components/ShareSection';
-import { SuggestionBox } from '@/components/SuggestionBox';
 import { lazy as lazyImport } from 'react';
 
+const CookieConsent = lazyImport(() => import('@/components/CookieConsent').then(m => ({ default: m.CookieConsent })));
+const ShareSection = lazyImport(() => import('@/components/ShareSection').then(m => ({ default: m.ShareSection })));
+const SuggestionBox = lazyImport(() => import('@/components/SuggestionBox').then(m => ({ default: m.SuggestionBox })));
+
 const ArticlesPage = lazyImport(() => import('@/pages/Articles').then(m => ({ default: m.ArticlesPage })));
-import { articles } from '@/data/articles';
+import { articleTeasers } from '@/data/article-teasers';
 import { categories, toolSuites, allIndividualTools, type Category } from '@/data/categories';
 import { Target, Zap, Shield, GraduationCap, Clock, ArrowRight } from 'lucide-react';
 
@@ -357,7 +358,7 @@ export default function App() {
       <CategoryGrid filter={searchFilter} onSelect={goToWorkspace} />
 
       {/* Latest Articles Teaser */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 cv-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold">
@@ -365,17 +366,17 @@ export default function App() {
             </h2>
             <p className="text-sm text-muted-foreground mt-1">Insights and knowledge every student and professional should know</p>
           </div>
-          <button onClick={() => setView('articles')} className="btn-secondary-premium text-xs whitespace-nowrap hidden sm:flex items-center gap-2">
+          <button onClick={() => setView('articles')} type="button" className="btn-secondary-premium text-xs whitespace-nowrap hidden sm:flex items-center gap-2" aria-label="View all articles">
             View All
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {articles.slice(0, 3).map(article => (
-            <button key={article.id} onClick={() => setView('articles')} className="text-left group">
+          {articleTeasers.map(article => (
+            <button key={article.id} onClick={() => setView('articles')} type="button" className="text-left group" aria-label={`Read article: ${article.title}`}>
               <div className="glass-card rounded-2xl overflow-hidden hover:border-primary/40 transition-all duration-300 h-full flex flex-col">
                 <div className="relative h-40 overflow-hidden">
-                  <img src={article.image} alt={article.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={article.image} alt={article.title} loading="lazy" decoding="async" width={400} height={200} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <span className="absolute bottom-2 left-2 text-[10px] font-medium text-white bg-black/40 backdrop-blur-sm px-2 py-1 rounded">{article.category}</span>
                 </div>
@@ -392,15 +393,17 @@ export default function App() {
           ))}
         </div>
         <div className="text-center mt-6 sm:hidden">
-          <button onClick={() => setView('articles')} className="btn-secondary-premium text-xs">View All Articles</button>
+          <button onClick={() => setView('articles')} type="button" className="btn-secondary-premium text-xs" aria-label="View all articles">View All Articles</button>
         </div>
       </section>
 
-      <ShareSection />
-      <SuggestionBox />
+      <Suspense fallback={null}><ShareSection /></Suspense>
+      <div className="cv-auto">
+        <Suspense fallback={null}><SuggestionBox /></Suspense>
+      </div>
       <div className="flex-1" />
       <Footer onNavigate={goToLegal} />
-      <CookieConsent onNavigate={goToLegal} />
+      <Suspense fallback={null}><CookieConsent onNavigate={goToLegal} /></Suspense>
     </div>
   );
 }
