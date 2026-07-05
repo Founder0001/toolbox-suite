@@ -84,9 +84,9 @@
   "dependencies": {
   // ... existing
   "react-error-boundary": "^5.0.0"
-},
+  },
 "devDependencies": {
   // ... existing
   "vite-plugin-compression": "^0.5.1"
-}
+  }
 }
