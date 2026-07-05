@@ -1,80 +1,61 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { visualizer } from 'rollup-plugin-visualizer';
-import compression from 'vite-plugin-compression';
-import { createHtmlPlugin } from 'vite-plugin-html';
-import { ViteMinifyPlugin } from 'vite-plugin-minify';
+import path from "path"
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite"
+import { inspectAttr } from 'kimi-plugin-inspect-react'
+import compression from 'vite-plugin-compression'
 
+// https://vite.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
-    // Generate brotli and gzip compressed files
+    inspectAttr(),
+    // Generate Brotli and Gzip compressed files
     compression({ algorithm: 'brotliCompress', ext: '.br' }),
     compression({ algorithm: 'gzip', ext: '.gz' }),
-    // Inline critical CSS into index.html (optional, but we'll handle it manually)
-    createHtmlPlugin({
-      minify: true,
-      inject: {
-        data: {
-          // Can inject env vars if needed
-        },
-      },
-    }),
-    ViteMinifyPlugin(),
-    // Optional: visualizer to see bundle size (remove in production if unwanted)
-    visualizer({
-      filename: 'dist/stats.html',
-      open: false,
-      gzipSize: true,
-      brotliSize: true,
-    }),
   ],
+  server: {
+    port: 3000,
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   build: {
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,       // remove console.log in production
+        drop_console: true,   // remove console.log in production
         drop_debugger: true,
       },
     },
+    sourcemap: false,         // disable source maps for smaller bundles
     rollupOptions: {
       output: {
         manualChunks: (id) => {
           // Split vendor libraries into separate chunks
           if (id.includes('node_modules')) {
-            // React and ReactDOM
             if (id.includes('react') || id.includes('react-dom')) {
               return 'vendor-react';
             }
-            // UI libraries (e.g., tailwind, lucide, etc.)
-            if (id.includes('lucide') || id.includes('tailwind')) {
+            if (id.includes('lucide') || id.includes('tailwind') || id.includes('class-variance-authority')) {
               return 'vendor-ui';
             }
-            // Heavy tools like pdf-lib, sharp, etc.
-            if (id.includes('pdf-lib') || id.includes('sharp') || id.includes('ffmpeg')) {
+            if (id.includes('pdf-lib') || id.includes('pdfjs') || id.includes('@imgly/background-removal')) {
               return 'vendor-heavy';
             }
-            // Everything else
             return 'vendor-other';
           }
         },
-        // Ensure chunks are not too large (optional)
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
-    // Increase chunk size warning limit (optional)
     chunkSizeWarningLimit: 1000,
-    // Generate source maps for debugging (remove for production if you want)
-    sourcemap: false,
   },
-  server: {
-    // Improve dev server performance
-    hmr: { overlay: false },
-  },
-  // Optimize dependencies pre-bundling
   optimizeDeps: {
-    include: ['react', 'react-dom', 'lucide-react', 'tailwindcss'],
+    include: ['react', 'react-dom', 'lucide-react', 'next-themes', 'tailwindcss'],
   },
 });
