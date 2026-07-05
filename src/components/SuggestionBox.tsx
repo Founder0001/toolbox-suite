@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Lightbulb, ThumbsUp, Send, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
-import { getSecureClient } from '@/lib/secure-client';
-import { Honeypot } from '@/components/Honeypot';
+import { createClient } from '@supabase/supabase-js';
 
-const supabase = getSecureClient();
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 interface Suggestion {
   id: string;
@@ -16,7 +18,7 @@ interface Suggestion {
 
 const categories = ['General', 'PDF Tools', 'Image Tools', 'Student Tools', 'Medical Tools', 'Code Tools', 'SEO Tools', 'Text Tools', 'Unit Converters', 'AI Prompts', 'Other'];
 
-export function SuggestionBox() {
+export const SuggestionBox = memo(function SuggestionBox() {
   const [toolName, setToolName] = useState('');
   const [category, setCategory] = useState('General');
   const [description, setDescription] = useState('');
@@ -27,9 +29,6 @@ export function SuggestionBox() {
   const [loading, setLoading] = useState(true);
   const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
-  const [honeypotTriggered, setHoneypotTriggered] = useState(false);
-  const submitCountRef = useRef(0);
-  const lastSubmitRef = useRef(0);
 
   const loadSuggestions = useCallback(async () => {
     setLoading(true);
@@ -50,29 +49,15 @@ export function SuggestionBox() {
 
   useEffect(() => {
     loadSuggestions();
-    // Load voted IDs from localStorage
     try {
       const stored = localStorage.getItem('toolbox-voted-suggestions');
       if (stored) setVotedIds(new Set(JSON.parse(stored)));
     } catch { /* ignore */ }
   }, [loadSuggestions]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!toolName.trim() || !description.trim()) {
       setError('Please enter a tool name and description.');
-      return;
-    }
-    if (honeypotTriggered) {
-      setError('Submission blocked.');
-      return;
-    }
-    const now = Date.now();
-    if (now - lastSubmitRef.current < 10000) {
-      setError('Please wait before submitting again.');
-      return;
-    }
-    if (submitCountRef.current >= 5) {
-      setError('Too many submissions. Please try later.');
       return;
     }
     setSubmitting(true);
@@ -87,8 +72,6 @@ export function SuggestionBox() {
           email: email.trim() || null,
         });
       if (error) throw error;
-      submitCountRef.current++;
-      lastSubmitRef.current = Date.now();
       setSubmitted(true);
       setToolName('');
       setDescription('');
@@ -100,13 +83,10 @@ export function SuggestionBox() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [toolName, description, category, email, loadSuggestions]);
 
-  const handleVote = async (id: string) => {
+  const handleVote = useCallback(async (id: string) => {
     if (votedIds.has(id)) return;
-    const now = Date.now();
-    if (now - lastSubmitRef.current < 2000) return;
-    lastSubmitRef.current = now;
     const suggestion = suggestions.find(s => s.id === id);
     if (!suggestion) return;
 
@@ -132,10 +112,16 @@ export function SuggestionBox() {
       reverted.delete(id);
       setVotedIds(reverted);
     }
-  };
+  }, [votedIds, suggestions]);
+
+  // Handlers for input changes (memoized)
+  const onToolNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setToolName(e.target.value), []);
+  const onCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value), []);
+  const onDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value), []);
+  const onEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), []);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" aria-label="Suggest a tool">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="glass-card rounded-2xl p-6 sm:p-8">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 mb-4">
@@ -150,45 +136,41 @@ export function SuggestionBox() {
         </div>
 
         {/* Submit Form */}
-        <Honeypot onChange={setHoneypotTriggered} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label htmlFor="suggestion-tool-name" className="block text-muted-foreground text-xs mb-1">Tool Name *</label>
+            <label className="block text-muted-foreground text-xs mb-1">Tool Name *</label>
             <input
-              id="suggestion-tool-name"
               type="text"
               placeholder="e.g. PDF to Excel Converter"
               value={toolName}
-              onChange={(e) => setToolName(e.target.value)}
+              onChange={onToolNameChange}
               className="premium-input w-full"
               maxLength={100}
             />
           </div>
           <div>
-            <label htmlFor="suggestion-category" className="block text-muted-foreground text-xs mb-1">Category</label>
-            <select id="suggestion-category" value={category} onChange={(e) => setCategory(e.target.value)} className="premium-input w-full">
+            <label className="block text-muted-foreground text-xs mb-1">Category</label>
+            <select value={category} onChange={onCategoryChange} className="premium-input w-full">
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="md:col-span-2">
-            <label htmlFor="suggestion-description" className="block text-muted-foreground text-xs mb-1">Description *</label>
+            <label className="block text-muted-foreground text-xs mb-1">Description *</label>
             <textarea
-              id="suggestion-description"
               placeholder="Describe what the tool should do..."
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={onDescriptionChange}
               className="premium-input w-full min-h-[80px] resize-y"
               maxLength={500}
             />
           </div>
           <div className="md:col-span-2">
-            <label htmlFor="suggestion-email" className="block text-muted-foreground text-xs mb-1">Email (optional — for updates)</label>
+            <label className="block text-muted-foreground text-xs mb-1">Email (optional — for updates)</label>
             <input
-              id="suggestion-email"
               type="email"
               placeholder="your@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={onEmailChange}
               className="premium-input w-full"
               maxLength={200}
             />
@@ -207,7 +189,6 @@ export function SuggestionBox() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          type="button"
           className="btn-premium text-xs w-full sm:w-auto flex items-center justify-center gap-2"
         >
           {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -236,7 +217,6 @@ export function SuggestionBox() {
                   <button
                     onClick={() => handleVote(s.id)}
                     disabled={votedIds.has(s.id)}
-                    type="button"
                     className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-all ${
                       votedIds.has(s.id)
                         ? 'bg-primary/20 text-primary cursor-default'
@@ -265,4 +245,4 @@ export function SuggestionBox() {
       </div>
     </section>
   );
-}
+});
