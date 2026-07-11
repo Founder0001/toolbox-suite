@@ -1,8 +1,23 @@
 User-agent: *
 Allow: /
-Disallow: /legal/
-Disallow: /api/
-Crawl-delay: 10
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 User-agent: AhrefsBot
 Disallow: /
@@ -31,4 +46,4 @@ Disallow: /
 User-agent: Sogou
 Disallow: /
 
-Sitemap: https://toolbox-suite.pages.dev/sitemap.xml
+Sitemap: https://toolbox-suite.clinicalscript-work.workers.dev/sitemap.xml
