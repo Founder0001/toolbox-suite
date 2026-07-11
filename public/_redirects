@@ -1,5 +1,5 @@
 # Force HTTPS
-http://toolbox-suite.pages.dev/* https://toolbox-suite.pages.dev/:splat 301
+http://app.toolbox-suite.workers.dev/* https://app.toolbox-suite.workers.dev/:splat 301
 
 # Block common attack paths
 /.env /404.html 200
