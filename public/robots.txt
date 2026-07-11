@@ -46,4 +46,4 @@ Disallow: /
 User-agent: Sogou
 Disallow: /
 
-Sitemap: https://toolbox-suite.clinicalscript-work.workers.dev/sitemap.xml
+Sitemap: https://app.toolbox-suite.workers.dev/sitemap.xml
