@@ -2,7 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /legal/
 Disallow: /api/
-Disallow: /tools/
 Crawl-delay: 10
 
 User-agent: AhrefsBot
