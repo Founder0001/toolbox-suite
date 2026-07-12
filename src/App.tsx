@@ -1,4 +1,12 @@
-import { useState, useCallback, lazy, Suspense } from 'react';
+import { useCallback, useEffect, lazy, Suspense } from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
 import { CategoryGrid } from '@/components/CategoryGrid';
@@ -23,8 +31,23 @@ const SeoToolsSuite = lazy(() => import('@/tools/SeoTools').then(m => ({ default
 const ImageToolsSuite = lazy(() => import('@/tools/ImageTools').then(m => ({ default: m.ImageToolsSuite })));
 const PdfToolsSuite = lazy(() => import('@/tools/PdfTools').then(m => ({ default: m.PdfToolsSuite })));
 
-type View = 'dashboard' | 'workspace' | 'legal' | 'articles';
 type LegalPage = 'about' | 'contact' | 'privacy' | 'terms' | 'cookie';
+
+// Real, crawlable URL slug for every category suite
+const categorySlugMap: Record<string, string> = {
+  pdfTools: 'pdf-tools',
+  imageTools: 'image-tools',
+  aiPromptTools: 'ai-prompt-tools',
+  studentTools: 'student-tools',
+  mbbsTools: 'medical-tools',
+  unitConverters: 'unit-converters',
+  codeUtilities: 'code-utilities',
+  textUtilities: 'text-utilities',
+  seoTools: 'seo-tools',
+};
+const slugToCategoryId: Record<string, string> = Object.fromEntries(
+  Object.entries(categorySlugMap).map(([id, slug]) => [slug, id])
+);
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center py-20">
@@ -260,40 +283,17 @@ function Workspace({ category, toolId, subToolId, onBack }: { category: Category
   );
 }
 
-export default function App() {
-  const [view, setView] = useState<View>('dashboard');
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null);
-  const [activeToolId, setActiveToolId] = useState('');
-  const [activeSubToolId, setActiveSubToolId] = useState<string | undefined>(undefined);
-  const [searchFilter, setSearchFilter] = useState('');
-  const [legalPage, setLegalPage] = useState<LegalPage>('about');
+// --- Route wrappers below wire the existing components to real URLs ---
 
-  const goToDashboard = useCallback(() => {
-    setView('dashboard');
-    setActiveCategory(null);
-    setActiveToolId('');
-    setSearchFilter('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+function DashboardRoute() {
+  const navigate = useNavigate();
 
   const goToWorkspace = useCallback((category: Category) => {
-    setActiveCategory(category);
-    setActiveToolId(category.toolIds[0] || '');
-    setActiveSubToolId(undefined);
-    setView('workspace');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const goToLegal = useCallback((page: LegalPage) => {
-    setLegalPage(page);
-    setView('legal');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    const slug = categorySlugMap[category.id];
+    if (slug) navigate(`/${slug}`);
+  }, [navigate]);
 
   const handleSearchToolSelect = useCallback((toolId: string) => {
-    // toolId may be a suite id (e.g. "pdfSuite") or an individual tool id (e.g. "pdf-merge")
-    // For suites, open the workspace directly. For individual tools, find the
-    // owning category and pass the individual tool id so the suite can focus it.
     const suite = toolSuites[toolId];
     if (suite) {
       const category = categories.find(c => c.id === suite.categoryId);
@@ -303,60 +303,25 @@ export default function App() {
     const allTool = allIndividualTools.find(t => t.id === toolId);
     if (allTool) {
       const category = categories.find(c => c.id === allTool.categoryId);
-      if (category) {
-        setActiveCategory(category);
-        setActiveToolId(category.toolIds[0] || '');
-        setActiveSubToolId(toolId);
-        setView('workspace');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      const slug = category ? categorySlugMap[category.id] : undefined;
+      if (slug) navigate(`/${slug}?tool=${toolId}`);
     }
-  }, [goToWorkspace]);
+  }, [goToWorkspace, navigate]);
 
-  const filteredCount = searchFilter
-    ? categories.filter(c =>
-        c.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-        c.description.toLowerCase().includes(searchFilter.toLowerCase()) ||
-        c.shortName.toLowerCase().includes(searchFilter.toLowerCase())
-      ).length
-    : categories.length;
+  const searchFilter = '';
+  const filteredCount = categories.length;
 
-  // Articles view
-  if (view === 'articles') {
-    return <Suspense fallback={<div className="flex items-center justify-center py-24 text-muted-foreground text-sm">Loading articles...</div>}><ArticlesPage onBack={goToDashboard} /></Suspense>;
-  }
-
-  // Workspace view
-  if (view === 'workspace' && activeCategory && activeToolId) {
-    return <Workspace category={activeCategory} toolId={activeToolId} subToolId={activeSubToolId} onBack={goToDashboard} />;
-  }
-
-  // Legal view
-  if (view === 'legal') {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar onBack={goToDashboard} showBack badge="Legal" />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <LegalContent page={legalPage} />
-        </main>
-        <Footer onNavigate={goToLegal} />
-      </div>
-    );
-  }
-
-  // Dashboard view
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar onArticles={() => setView('articles')} />
+      <Navbar onArticles={() => navigate('/articles')} />
       <Hero
         searchValue={searchFilter}
-        onSearchChange={setSearchFilter}
+        onSearchChange={() => {}}
         resultCount={filteredCount}
         onToolSelect={handleSearchToolSelect}
       />
       <CategoryGrid filter={searchFilter} onSelect={goToWorkspace} />
 
-      {/* Latest Articles Teaser */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -365,14 +330,14 @@ export default function App() {
             </h2>
             <p className="text-sm text-muted-foreground mt-1">Insights and knowledge every student and professional should know</p>
           </div>
-          <button onClick={() => setView('articles')} className="btn-secondary-premium text-xs whitespace-nowrap hidden sm:flex items-center gap-2">
+          <button onClick={() => navigate('/articles')} className="btn-secondary-premium text-xs whitespace-nowrap hidden sm:flex items-center gap-2">
             View All
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {articles.slice(0, 3).map(article => (
-            <button key={article.id} onClick={() => setView('articles')} className="text-left group">
+            <button key={article.id} onClick={() => navigate('/articles')} className="text-left group">
               <div className="glass-card rounded-2xl overflow-hidden hover:border-primary/40 transition-all duration-300 h-full flex flex-col">
                 <div className="relative h-40 overflow-hidden">
                   <img src={article.image} alt={article.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -392,15 +357,81 @@ export default function App() {
           ))}
         </div>
         <div className="text-center mt-6 sm:hidden">
-          <button onClick={() => setView('articles')} className="btn-secondary-premium text-xs">View All Articles</button>
+          <button onClick={() => navigate('/articles')} className="btn-secondary-premium text-xs">View All Articles</button>
         </div>
       </section>
 
       <ShareSection />
       <SuggestionBox />
       <div className="flex-1" />
-      <Footer onNavigate={goToLegal} />
-      <CookieConsent onNavigate={goToLegal} />
+      <Footer onNavigate={(page: LegalPage) => navigate(`/${page === 'privacy' ? 'privacy-policy' : page === 'cookie' ? 'cookie-policy' : page}`)} />
+      <CookieConsent onNavigate={(page: LegalPage) => navigate(`/${page === 'privacy' ? 'privacy-policy' : page === 'cookie' ? 'cookie-policy' : page}`)} />
     </div>
+  );
+}
+
+function ArticlesRoute() {
+  const navigate = useNavigate();
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-24 text-muted-foreground text-sm">Loading articles...</div>}>
+      <ArticlesPage onBack={() => navigate('/')} />
+    </Suspense>
+  );
+}
+
+function WorkspaceRoute() {
+  const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const categoryId = slug ? slugToCategoryId[slug] : undefined;
+  const category = categories.find(c => c.id === categoryId);
+
+  useEffect(() => {
+    if (!category) navigate('/', { replace: true });
+  }, [category, navigate]);
+
+  if (!category) return null;
+
+  const toolId = category.toolIds[0] || '';
+  const subToolId = searchParams.get('tool') || undefined;
+
+  return <Workspace category={category} toolId={toolId} subToolId={subToolId} onBack={() => navigate('/')} />;
+}
+
+function LegalRoute({ page }: { page: LegalPage }) {
+  const navigate = useNavigate();
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar onBack={() => navigate('/')} showBack badge="Legal" />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LegalContent page={page} />
+      </main>
+      <Footer onNavigate={(p: LegalPage) => navigate(`/${p === 'privacy' ? 'privacy-policy' : p === 'cookie' ? 'cookie-policy' : p}`)} />
+    </div>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<DashboardRoute />} />
+      <Route path="/articles" element={<ArticlesRoute />} />
+      <Route path="/about" element={<LegalRoute page="about" />} />
+      <Route path="/contact" element={<LegalRoute page="contact" />} />
+      <Route path="/privacy-policy" element={<LegalRoute page="privacy" />} />
+      <Route path="/terms" element={<LegalRoute page="terms" />} />
+      <Route path="/cookie-policy" element={<LegalRoute page="cookie" />} />
+      <Route path="/:slug" element={<WorkspaceRoute />} />
+      <Route path="*" element={<DashboardRoute />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
